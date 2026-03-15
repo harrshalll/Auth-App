@@ -24,7 +24,7 @@ hs_err_pid*
 replay_pid*
 
 #resources
-application.yaml
-application-dev.yml
-application-qa.yml
-application-prod.yml
+src/main/resources/application.yaml
+src/main/resources/application-dev.yml
+src/main/resources/application-qa.yml
+src/main/resources/application-prod.yml
