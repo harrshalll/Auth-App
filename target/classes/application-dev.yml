@@ -1,0 +1,16 @@
+#database connection
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/Auth_App
+    username: postgres
+    password: Harshal@2003
+
+    # Jpa and Hibernate Configuration
+  jpa:          #This Property create Table For Entity
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
