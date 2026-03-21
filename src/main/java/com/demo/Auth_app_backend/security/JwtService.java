@@ -26,8 +26,8 @@ public class JwtService {
 
     public JwtService(
             @Value("${security.jwt.secret}")String secret,
-            @Value("${security.jwt.access-ttl-second}") long accessTtlSeconds,
-            @Value("${security.jwt.refresh-ttl-second}") long refreshTtlSeconds,
+            @Value("${security.jwt.access-ttl-seconds}") long accessTtlSeconds,
+            @Value("${security.jwt.refresh-ttl-seconds}") long refreshTtlSeconds,
             @Value("${security.jwt.issuer}") String issuer) {
 
         if (secret == null || secret.length() < 64) {
@@ -103,4 +103,10 @@ public class JwtService {
         Claims c = parse(token).getPayload();
         return UUID.fromString(c.getSubject());
     }
+    public String getEmail(String token) {
+        Claims c = parse(token).getPayload();
+        return "email".equals(c.get(user.getEmail));
+    }
+
+    public
 }

@@ -1,0 +1,107 @@
+package com.demo.Auth_app_backend.security;
+
+import com.demo.Auth_app_backend.entities.User;
+import com.demo.Auth_app_backend.repositories.UserRepository;
+import io.jsonwebtoken.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Component
+@RequiredArgsConstructor
+@AllArgsConstructor
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private final JwtService jwtService;
+    private final UserRepository userRepository;
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String header = request.getHeader("Authorization");
+
+        //Token extraction, then validation then create Authentication and loads into security context
+        if (header != null && header.startsWith("Bearer ")) {
+
+            String token = header.substring(7);
+
+            //check access token
+            if (!jwtService.isAccessToken(token)) {//if token is not access token
+                filterChain.doFilter(request,response);//move to next filter
+                return;
+            }
+            try {
+                Jws<Claims> parse = jwtService.parse(token);
+                Claims payload = parse.getPayload();
+                String userId =payload.getSubject();
+                UUID userUuid = UUID.fromString(payload.getSubject());
+
+                userRepository.findById(userUuid)
+                        .ifPresent(user ->{
+
+                            //check if user is enabled or not
+                            if (!user.isEnable() ) {//If user is not enable then move to next filter
+                                try {
+                                    filterChain.doFilter(request,response);
+                                    return;
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                } catch (ServletException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                            //after getting user we can extract details from him like roles etc
+                            List<GrantedAuthority> authorities;
+
+                            if (user.getRoles() == null) {
+                                    authorities = List.of();
+                            } else {
+                                authorities = user.getRoles()
+                                        .stream()
+                                        .map(role -> new SimpleGrantedAuthority(role.getName()))
+                                        .collect(Collectors.toList());
+                            }
+                            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                                    user.getEmail(),
+                                    null,
+                                    authorities
+                            );
+                            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));//Stores:Remote IP address and Session ID
+                            //checks if context doesn't have any context before loading authentication in context holder
+                            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                                SecurityContextHolder.getContext().setAuthentication(authentication);//loads authenticated object inside security context so user can access authorize request according to his role
+                            }
+
+                        });
+
+            } catch (ExpiredJwtException e) {
+                e.printStackTrace();
+            } catch (MalformedJwtException e){
+                e.printStackTrace();
+            } catch (JwtException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        filterChain.doFilter(request,response);//moves to next filter
+        //CALL doFilter()
+        //Request continues →
+        //Controller is reached →
+        //API works
+
+    }
+}
