@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,26 +26,28 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-@AllArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String header = request.getHeader("Authorization");
+        logger.info("Authorization Header: {}" ,header);
 
         //Token extraction, then validation then create Authentication and loads into security context
         if (header != null && header.startsWith("Bearer ")) {
 
             String token = header.substring(7);
 
-            //check access token
-            if (!jwtService.isAccessToken(token)) {//if token is not access token
-                filterChain.doFilter(request,response);//move to next filter
-                return;
-            }
             try {
+                //check access token
+                if (!jwtService.isAccessToken(token)) {//if token is not access token
+                    filterChain.doFilter(request,response);//move to next filter
+                    return;
+                }
                 Jws<Claims> parse = jwtService.parse(token);
                 Claims payload = parse.getPayload();
                 String userId =payload.getSubject();
