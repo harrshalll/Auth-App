@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class CustomUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {//Customizing the UserDetailsService which retrieve the data from DB
     private final UserRepository userRepository;
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {//Implementation Method which retrieving the data for login
         //Use this when you want to log through more than one type like email, username, password
        // User user;
 //        if (input.contains("@")) {

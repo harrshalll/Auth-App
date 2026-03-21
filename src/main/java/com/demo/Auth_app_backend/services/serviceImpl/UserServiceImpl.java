@@ -30,14 +30,14 @@ public class UserServiceImpl implements UserService {
         if(userRepository.existsByEmail(userDto.getEmail())){
             throw new IllegalArgumentException("User With this Email already Exists!");
         }
-        User user = modelMapper.map(userDto, User.class);
+        User user = modelMapper.map(userDto, User.class);//Mapping Dto to actual User in DB.
         if (userDto.getProvider() != null) {
             userDto.setProvider(userDto.getProvider());
         }else{
             userDto.setProvider(Provider.LOCAL);
         }
-        User savedUser = userRepository.save(user);
-        return modelMapper.map(savedUser, UserDto.class);
+        User savedUser = userRepository.save(user);//Saved the user
+        return modelMapper.map(savedUser, UserDto.class);//This method return the Dto hence remap the User to User dto for display
     }
 
     @Override
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository
                 .findByEmail(email)
                 .orElseThrow(()-> new ResourceNotFoundException("User Not Found With email id"));
-        return modelMapper.map(user, UserDto.class);
+        return modelMapper.map(user, UserDto.class);//UserRepository return the User Object. But we can't display sensitive fields hence we map User to UserDto
     }
 
     @Override
@@ -56,16 +56,16 @@ public class UserServiceImpl implements UserService {
         //TODO:change password updation logic...
         User existingUser = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException(("User with given id does not exists")));
         if (userDto.getName() != null) {
-            existingUser.setName(userDto.getName());
+            existingUser.setName(userDto.getName());//existing User can update Name ,and it is taking that name from userDto by userDto.getName()
         }
         if (userDto.getPassword() != null) {
-            existingUser.setPassword(userDto.getPassword());
+            existingUser.setPassword(userDto.getPassword());//existing User can update password ,and it is taking that name from userDto by userDto.getPassword()
         }
         if (userDto.getImage() != null) {
-            existingUser.setImage(userDto.getImage());
+            existingUser.setImage(userDto.getImage());//existing User can Update Image ,and it is taking that name from userDto by userDto.getImage()
         }
-        User updatedUser = userRepository.save(existingUser);
-        return modelMapper.map(updatedUser, UserDto.class);
+        User updatedUser = userRepository.save(existingUser);//User saved after update
+        return modelMapper.map(updatedUser, UserDto.class);//again it is mapped to userDto
     }
 
     @Override
