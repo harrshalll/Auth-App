@@ -123,16 +123,6 @@ src/main/java/com/demo/Auth_app_backend/
 
 ---
 
-## ⚙️ Configuration (application.yml)
-
-```yaml
-security:
-  jwt:
-    secret: your-super-secret-key-should-be-long
-    access-ttl-seconds: 3600
-    refresh-ttl-seconds: 86400
-    issuer: auth-app
-```
 
 ---
 
