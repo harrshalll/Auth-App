@@ -23,8 +23,8 @@ A secure authentication and authorization backend built using **Spring Boot**, i
 * **Spring Boot**
 * **Spring Security**
 * **JWT (io.jsonwebtoken - JJWT)**
-* **Hibernate / JPA**
-* **MySQL / PostgreSQL**
+* **JPA**
+* **PostgreSQL**
 * **Maven**
 
 ---
