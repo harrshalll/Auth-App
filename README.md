@@ -29,7 +29,7 @@ A secure authentication and authorization backend built using **Spring Boot**, i
 
 ---
 
-## 📁 Project Structure
+## 📁 Project Structure (Updated)
 
 ```
 src/main/java/com/demo/Auth_app_backend/
@@ -40,8 +40,49 @@ src/main/java/com/demo/Auth_app_backend/
 ├── repositories/         # Database access layer
 ├── security/             # JWT & Filters
 ├── service/              # Business logic
-└── dto/                  # Data Transfer Objects
+├── dto/                  # Data Transfer Objects
+├── exception/            # Custom exceptions & global handlers
+│   ├── GlobalExceptionHandler.java   # Handles all exceptions globally
+│   ├── ResourceNotFoundException.java
+│   ├── BadRequestException.java
+│   ├── UnauthorizedException.java
+│   └── ApiError.java                # Standard error response structure
 ```
+
+---
+
+## ⚠️ Exception Handling Overview
+
+* Centralized exception handling using `@ControllerAdvice`
+* Custom exceptions for better readability and control
+* Consistent API error responses
+
+---
+
+## 🧱 Example Components
+
+### 1. Custom Exception
+
+
+---
+
+### 2. Global Exception Handler
+
+
+---
+
+### 3. Error Response DTO
+
+---
+
+## 🎯 Benefits
+
+* Cleaner controllers (no try-catch everywhere)
+* Standardized error responses
+* Easy debugging
+* Production-ready structure
+
+---
 
 ---
 
