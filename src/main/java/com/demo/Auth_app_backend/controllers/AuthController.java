@@ -7,8 +7,10 @@ import com.demo.Auth_app_backend.entities.RefreshToken;
 import com.demo.Auth_app_backend.entities.User;
 import com.demo.Auth_app_backend.repositories.RefreshTokenRepository;
 import com.demo.Auth_app_backend.repositories.UserRepository;
+import com.demo.Auth_app_backend.security.CookieService;
 import com.demo.Auth_app_backend.security.JwtService;
 import com.demo.Auth_app_backend.services.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -36,9 +38,10 @@ public class AuthController {
     private final JwtService jwtService;
     private final ModelMapper modelMapper;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final CookieService cookieService;
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         //call the authentication method to authenticate the user for login
         Authentication authentication = authenticate(loginRequest);
         User user = userRepository.findByEmail(loginRequest.email()).orElseThrow(()-> new BadCredentialsException("Invalid Username or Password!!"));
@@ -64,6 +67,10 @@ public class AuthController {
         String token = jwtService.generateJwtToken(user);
         //generating the refresh token
         String refreshToken = jwtService.generateRefreshToken(user, refreshTokenOb.getJti());
+
+        //attach refresh token in cookie
+        cookieService.attachRefreshCookie(response,refreshToken,(int)jwtService.getRefreshTtlSeconds());
+        cookieService.addNoStoreHeaders(response);
 
         TokenResponse tokenResponse = TokenResponse.of(token,refreshToken,jwtService.getAccessTtlSeconds(),modelMapper.map(user,UserDto.class));
         return ResponseEntity.ok(tokenResponse);
