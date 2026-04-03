@@ -140,7 +140,7 @@ src/main/java/com/demo/Auth_app_backend/
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/auth-app.git
+   git clone https://github.com/harrshalll/auth-app.git
    ```
 
 2. Navigate to project:
